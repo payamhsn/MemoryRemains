@@ -19,6 +19,10 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    previousLogin: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true }
 );

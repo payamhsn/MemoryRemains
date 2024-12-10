@@ -60,6 +60,30 @@ export const useAuthStore = create((set) => ({
     }
   },
 
+  clearUserData: () =>
+    set({ notes: [], accounts: [], isLoading: false, error: null }),
+
+  updateProfile: async (userData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.put(
+        `${API_URL}/auth/update-profile`,
+        userData
+      );
+      set((state) => ({
+        user: { ...state.user, ...response.data.user },
+        isLoading: false,
+        error: null,
+      }));
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error updating profile",
+        isLoading: false,
+      });
+      throw error;
+    }
+  },
+
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -70,6 +94,7 @@ export const useAuthStore = create((set) => ({
         error: null,
         isLoading: false,
       });
+      useAuthStore.getState().clearUserData();
     } catch (error) {
       set({ error: "Error logging out", isLoading: false });
       throw error;

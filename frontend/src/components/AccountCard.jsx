@@ -1,6 +1,14 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 const AccountCard = ({ account, onEdit, onDelete }) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -13,6 +21,19 @@ const AccountCard = ({ account, onEdit, onDelete }) => {
         {account.platform}
       </h3>
       <p className="text-gray-300 mb-1">Username: {account.username}</p>
+      <div className="flex items-center mb-1">
+        <p className="text-gray-300 mr-2">
+          Password: {showPassword ? account.password : "••••••••"}
+        </p>
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={togglePasswordVisibility}
+          className="text-gray-400 hover:text-gray-200"
+        >
+          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+        </motion.button>
+      </div>
       <p className="text-gray-400 mb-4">{account.description}</p>
       <div className="flex justify-end">
         <motion.button
