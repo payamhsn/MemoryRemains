@@ -35,14 +35,14 @@ const DashboardPage = () => {
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration: 0.5 }}
-      className="max-w-6xl w-full mx-auto mt-10 p-8 bg-gray-900 bg-opacity-80 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl border border-gray-800"
+      className="max-w-6xl w-full mx-auto my-5 p-8 bg-gray-900 bg-opacity-70 backdrop-filter backdrop-blur-lg rounded-xl shadow-2xl border border-gray-800 h-[90vh] flex flex-col"
     >
       <h2 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-green-400 to-emerald-600 text-transparent bg-clip-text">
         Dashboard
       </h2>
 
-      <div className="flex">
-        <div className="w-1/4 pr-6 border-r border-gray-700">
+      <div className="flex flex-grow overflow-hidden">
+        <div className="w-1/4 pr-6 border-r border-gray-700 overflow-y-auto">
           <nav className="space-y-2">
             {["profile", "accounts", "notes", "settings"].map((tab) => (
               <button
@@ -69,7 +69,7 @@ const DashboardPage = () => {
             Logout
           </motion.button>
         </div>
-        <div className="w-3/4 pl-6">{renderTabContent()}</div>
+        <div className="w-3/4 pl-6 overflow-y-auto">{renderTabContent()}</div>
       </div>
     </motion.div>
   );

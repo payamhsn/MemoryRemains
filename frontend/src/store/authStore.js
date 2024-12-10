@@ -2,9 +2,7 @@ import { create } from "zustand";
 import axios from "axios";
 
 const API_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:5000/api/auth"
-    : "/api/auth";
+  import.meta.env.MODE === "development" ? "http://localhost:5000/api" : "/api";
 
 axios.defaults.withCredentials = true;
 
@@ -15,11 +13,13 @@ export const useAuthStore = create((set) => ({
   isLoading: false,
   isCheckingAuth: true,
   message: null,
+  notes: [],
+  accounts: [],
 
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/signup`, {
+      const response = await axios.post(`${API_URL}/auth/signup`, {
         email,
         password,
         name,
@@ -40,7 +40,8 @@ export const useAuthStore = create((set) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.post(`${API_URL}/login`, {
+      // console.log("Logging in...");
+      const response = await axios.post(`${API_URL}/auth/login`, {
         email,
         password,
       });
@@ -62,7 +63,7 @@ export const useAuthStore = create((set) => ({
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      await axios.post(`${API_URL}/logout`);
+      await axios.post(`${API_URL}/auth/logout`);
       set({
         user: null,
         isAuthenticated: false,
@@ -78,7 +79,7 @@ export const useAuthStore = create((set) => ({
   checkAuth: async () => {
     set({ isCheckingAuth: true, error: null });
     try {
-      const response = await axios.get(`${API_URL}/check-auth`);
+      const response = await axios.get(`${API_URL}/auth/check-auth`);
       set({
         user: response.data.user,
         isAuthenticated: true,
@@ -86,6 +87,126 @@ export const useAuthStore = create((set) => ({
       });
     } catch (error) {
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
+    }
+  },
+  // Functions for notes
+
+  fetchNotes: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get(`${API_URL}/notes`);
+      set({ notes: response.data, isLoading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error fetching notes",
+        isLoading: false,
+      });
+    }
+  },
+
+  createNote: async (noteData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(`${API_URL}/notes`, noteData);
+      set((state) => ({
+        notes: [...state.notes, response.data],
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error creating note",
+        isLoading: false,
+      });
+    }
+  },
+
+  updateNote: async (noteId, noteData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.put(`${API_URL}/notes/${noteId}`, noteData);
+      set((state) => ({
+        notes: state.notes.map((note) =>
+          note._id === noteId ? response.data : note
+        ),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error updating note",
+        isLoading: false,
+      });
+    }
+  },
+
+  deleteNote: async (noteId) => {
+    set({ isLoading: true, error: null });
+    try {
+      await axios.delete(`${API_URL}/notes/${noteId}`);
+      set((state) => ({
+        notes: state.notes.filter((note) => note._id !== noteId),
+        isLoading: false,
+      }));
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error deleting note",
+        isLoading: false,
+      });
+    }
+  },
+  fetchAccounts: async () => {
+    set({ isLoading: true });
+    try {
+      const response = await axios.get(`${API_URL}/accounts`);
+      set({ accounts: response.data, isLoading: false, error: null });
+    } catch (error) {
+      set({ isLoading: false, error: error.response.data.message });
+    }
+  },
+
+  createAccount: async (accountData) => {
+    set({ isLoading: true });
+    try {
+      const response = await axios.post(`${API_URL}/accounts`, accountData);
+      set((state) => ({
+        accounts: [...state.accounts, response.data],
+        isLoading: false,
+        error: null,
+      }));
+    } catch (error) {
+      set({ isLoading: false, error: error.response.data.message });
+    }
+  },
+
+  updateAccount: async (id, accountData) => {
+    set({ isLoading: true });
+    try {
+      const response = await axios.put(
+        `${API_URL}/accounts/${id}`,
+        accountData
+      );
+      set((state) => ({
+        accounts: state.accounts.map((account) =>
+          account._id === id ? response.data : account
+        ),
+        isLoading: false,
+        error: null,
+      }));
+    } catch (error) {
+      set({ isLoading: false, error: error.response.data.message });
+    }
+  },
+
+  deleteAccount: async (id) => {
+    set({ isLoading: true });
+    try {
+      await axios.delete(`${API_URL}/accounts/${id}`);
+      set((state) => ({
+        accounts: state.accounts.filter((account) => account._id !== id),
+        isLoading: false,
+        error: null,
+      }));
+    } catch (error) {
+      set({ isLoading: false, error: error.response.data.message });
     }
   },
 }));
