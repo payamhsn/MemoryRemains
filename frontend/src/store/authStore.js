@@ -15,6 +15,7 @@ export const useAuthStore = create((set) => ({
   message: null,
   notes: [],
   accounts: [],
+  trustedPerson: null,
 
   signup: async (email, password, name) => {
     set({ isLoading: true, error: null });
@@ -232,6 +233,100 @@ export const useAuthStore = create((set) => ({
       }));
     } catch (error) {
       set({ isLoading: false, error: error.response.data.message });
+    }
+  },
+
+  // Trusted Person functions
+  fetchTrustedPerson: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get(`${API_URL}/trusted-person`);
+      set({ trustedPerson: response.data.trustedPerson, isLoading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error fetching trusted person",
+        isLoading: false,
+      });
+    }
+  },
+
+  saveTrustedPerson: async (trustedPersonData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.post(
+        `${API_URL}/trusted-person`,
+        trustedPersonData
+      );
+      set({ trustedPerson: response.data.trustedPerson, isLoading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error saving trusted person",
+        isLoading: false,
+      });
+    }
+  },
+
+  updateTrustedPerson: async (trustedPersonData) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.put(
+        `${API_URL}/trusted-person`,
+        trustedPersonData
+      );
+      set({ trustedPerson: response.data.trustedPerson, isLoading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error updating trusted person",
+        isLoading: false,
+      });
+    }
+  },
+
+  deleteTrustedPerson: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      await axios.delete(`${API_URL}/trusted-person`);
+      set({ trustedPerson: null, isLoading: false });
+    } catch (error) {
+      set({
+        error: error.response?.data?.message || "Error deleting trusted person",
+        isLoading: false,
+      });
+    }
+  },
+
+  fetchInactivityPeriod: async () => {
+    try {
+      const response = await axios.get(`${API_URL}/inactivity-period`);
+      set((state) => ({
+        user: {
+          ...state.user,
+          inactivityPeriod: response.data.inactivityPeriod,
+        },
+      }));
+      return response.data.inactivityPeriod;
+    } catch (error) {
+      console.error("Error fetching inactivity period:", error);
+      return null;
+    }
+  },
+
+  updateInactivityPeriod: async (period) => {
+    set({ isLoading: true });
+    try {
+      await axios.post(`${API_URL}/inactivity-period`, {
+        inactivityPeriod: period,
+      });
+      set((state) => ({
+        user: {
+          ...state.user,
+          inactivityPeriod: period,
+        },
+        isLoading: false,
+      }));
+    } catch (error) {
+      console.error("Error updating inactivity period:", error);
+      set({ isLoading: false });
     }
   },
 }));

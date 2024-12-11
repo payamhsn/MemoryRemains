@@ -9,7 +9,8 @@ import { connectDB } from "./db/connectDB.js";
 import authRoutes from "./routes/auth.route.js";
 import noteRoutes from "./routes/noteRoutes.js";
 import accountRoutes from "./routes/accountRoutes.js";
-
+import trustedPersonRoutes from "./routes/trustedPersonRoutes.js";
+import periodRoutes from "./routes/periodRoutes.js";
 dotenv.config();
 
 const app = express();
@@ -24,6 +25,8 @@ app.use(cookieParser()); // allows us to parse incoming cookies
 app.use("/api/auth", authRoutes);
 app.use("/api/notes", noteRoutes);
 app.use("/api/accounts", accountRoutes);
+app.use("/api/trusted-person", trustedPersonRoutes);
+app.use("/api/inactivity-period", periodRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "/frontend/dist")));
